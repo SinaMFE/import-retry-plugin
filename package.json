@@ -1,0 +1,19 @@
+{
+  "name": "import-retry-plugin",
+  "version": "1.0.0",
+  "description": "dynamic import script with webpack4 ，when loading chunk error，retry it and break cdn ticks",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SinaMFE/import-retry-plugin.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/SinaMFE/import-retry-plugin/issues"
+  },
+  "homepage": "https://github.com/SinaMFE/import-retry-plugin#readme"
+}
