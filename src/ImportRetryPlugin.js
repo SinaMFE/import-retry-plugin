@@ -6,13 +6,8 @@
 
 const Template = require("webpack/lib/Template")
 const { SyncWaterfallHook } = require("tapable");
-
 class ImportRetryPlugin {
 	apply(compiler) {
-		// for(var a in compiler.hooks){
-		// 	console.log(a);
-		// }
-		// console.log(compiler.hooks.shouldEmit);
 		compiler.hooks.compilation.tap("JsonpTemplatePlugin", compilation => {
 			let mainTemplate = compilation.mainTemplate;
 			console.log(mainTemplate.hooks);
@@ -34,7 +29,6 @@ class ImportRetryPlugin {
 						mainTemplate.outputOptions.crossOriginLoading;
 					const chunkLoadTimeout = mainTemplate.outputOptions.chunkLoadTimeout;
 					const jsonpScriptType = mainTemplate.outputOptions.jsonpScriptType;
-	
 					return Template.asString([
 						"var script = document.createElement('script');",
 						"var onScriptComplete;",
