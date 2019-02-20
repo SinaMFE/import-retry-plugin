@@ -1,7 +1,7 @@
 
 <h2 align="center">Scope</h2>
 
-1. cdn hijacking occasionally; sometimes  request with  ticks("react.js?v=12345) is usefull;
+1. cdn hijacking occasionally; sometimes  request with  random params (like "react.js?v=12345) is usefull;
 2. the plugin is in case of webpack4  and is work only with chunked script
 
 <h2 align="center">routeMap</h2>
