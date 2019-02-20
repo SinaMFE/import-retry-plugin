@@ -7,7 +7,7 @@ import del from 'del';
 import path from 'path';
 import webpack from 'webpack';
 import MemoryFS from 'memory-fs';
-import ImportRetryPlugin from "../../src/index"
+import ImportRetryPlugin from "../../dist/index"
 const module = (config) => {
   return {
     rules: config.rules || config.loader
@@ -55,14 +55,11 @@ export default function (fixture, config, options) {
   if (options.output) del.sync(config.output.path);
 
   const compiler = webpack(config);
-  console.log(options.output);
   let  mfs =  new MemoryFS();
   if (!options.output) compiler.outputFileSystem = mfs;
 
   return new Promise((resolve, reject) => compiler.run((err, stats) => {
     if (err) reject(err);
-    // console.log();
-    // console.log(JSON.stringify(mfs.data.Users.frankzhang));
     resolve( mfs.readFileSync(stats.toJson().outputPath+"/"+stats.toJson().assetsByChunkName.main));
   }));
 }

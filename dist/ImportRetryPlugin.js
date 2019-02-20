@@ -21,14 +21,8 @@ var ImportRetryPlugin = function () {
 	_createClass(ImportRetryPlugin, [{
 		key: "apply",
 		value: function apply(compiler) {
-			// for(var a in compiler.hooks){
-			// 	console.log(a);
-			// }
-			// console.log(compiler.hooks.shouldEmit);
 			compiler.hooks.compilation.tap("JsonpTemplatePlugin", function (compilation) {
 				var mainTemplate = compilation.mainTemplate;
-				console.log(mainTemplate.hooks);
-				console.log('hahahahaha');
 				// TODO webpack 5, no adding to .hooks, use WeakMap and static methods
 				["jsonpScript", "linkPreload", "linkPrefetch"].forEach(function (hook) {
 					if (!mainTemplate.hooks[hook]) {
@@ -39,8 +33,7 @@ var ImportRetryPlugin = function () {
 					var crossOriginLoading = mainTemplate.outputOptions.crossOriginLoading;
 					var chunkLoadTimeout = mainTemplate.outputOptions.chunkLoadTimeout;
 					var jsonpScriptType = mainTemplate.outputOptions.jsonpScriptType;
-
-					return Template.asString(["var script = document.createElement('script');", "var onScriptComplete;", jsonpScriptType ? `script.type = ${JSON.stringify(jsonpScriptType)};` : "", "script.charset = 'utf-8';", `script.timeout = ${chunkLoadTimeout / 1000};`, `if (${mainTemplate.requireFn}.nc) {`, Template.indent(`script.setAttribute("nonce", ${mainTemplate.requireFn}.nc);`), "}", "script.src = jsonpScriptSrc(chunkId);", crossOriginLoading ? Template.asString(["if (script.src.indexOf(window.location.origin + '/') !== 0) {", Template.indent(`script.crossOrigin = ${JSON.stringify(crossOriginLoading)};`), "}"]) : "", "onScriptComplete = function (event) {", Template.indent(["// avoid mem leaks in IE.", "script.onerror = script.onload = null;", "clearTimeout(timeout);", "var chunk = installedChunks[chunkId];", "if(chunk !== 0) {", Template.indent(["if(chunk) {", Template.indent(["var errorType = event && (event.type === 'load' ? 'missing' : event.type);", "var realSrc = event && event.target && event.target.src;", "var error = new Error('hahhaa 我该好你了 chunk ' + chunkId + ' failed.\\n(' + errorType + ': ' + realSrc + ')');", "error.type = errorType;", "error.request = realSrc;", "chunk[1](error);"]), "}", "installedChunks[chunkId] = undefined;"]), "}"]), "};", "var timeout = setTimeout(function(){", Template.indent(["onScriptComplete({ type: 'timeout', target: script });"]), `}, ${chunkLoadTimeout});`, "script.onerror = script.onload = onScriptComplete;"]);
+					return Template.asString(["var script = document.createElement('script');", "var onScriptComplete;", jsonpScriptType ? `script.type = ${JSON.stringify(jsonpScriptType)};` : "", "script.charset = 'utf-8';", `script.timeout = ${chunkLoadTimeout / 1000};`, `if (${mainTemplate.requireFn}.nc) {`, Template.indent(`script.setAttribute("nonce", ${mainTemplate.requireFn}.nc);`), "}", "if(!window.retryerror){", "window.retryerror={};", "}", "var src = jsonpScriptSrc(chunkId);", "if(window.retryerror[chunkId]==1){", "src=src.indexOf('?')>0?(src+'&t='+new Date().getTime()):src+'?t='+new Date().getTime()", "}", "script.src = src;", crossOriginLoading ? Template.asString(["if (script.src.indexOf(window.location.origin + '/') !== 0) {", Template.indent(`script.crossOrigin = ${JSON.stringify(crossOriginLoading)};`), "}"]) : "", "onScriptComplete = function (event) {", Template.indent(["// avoid mem leaks in IE.", "script.onerror = script.onload = null;", "clearTimeout(timeout);", "var chunk = installedChunks[chunkId];", "if(chunk !== 0) {", Template.indent(["if(chunk) {", Template.indent(["var realSrc = event && event.target && event.target.src;", "if(window.retryerror[chunkId]==1){", "var errorType = event && (event.type === 'load' ? 'missing' : event.type);", "var error = new Error('Loading chunk ' + chunkId + ' failed.\\n(' + errorType + ': ' + realSrc + ')');", "error.type = errorType;", "error.request = realSrc;", "chunk[1](error);", "installedChunks[chunkId] = undefined;", "return;", "}"]), "}", "window.retryerror[chunkId]=1;", "installedChunks[chunkId] = undefined;", "requireEnsure(chunkId);"]), "}"]), "};", "var timeout = setTimeout(function(){", Template.indent(["onScriptComplete({ type: 'timeout', target: script });"]), `}, ${chunkLoadTimeout});`, "script.onerror = script.onload = onScriptComplete;"]);
 				});
 			});
 		}

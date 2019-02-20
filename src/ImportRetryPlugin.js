@@ -10,8 +10,6 @@ class ImportRetryPlugin {
 	apply(compiler) {
 		compiler.hooks.compilation.tap("JsonpTemplatePlugin", compilation => {
 			let mainTemplate = compilation.mainTemplate;
-			console.log(mainTemplate.hooks);
-			console.log('hahahahaha');
 				// TODO webpack 5, no adding to .hooks, use WeakMap and static methods
 			["jsonpScript", "linkPreload", "linkPrefetch"].forEach(hook => {
 				if (!mainTemplate.hooks[hook]) {
@@ -42,7 +40,14 @@ class ImportRetryPlugin {
 							`script.setAttribute("nonce", ${mainTemplate.requireFn}.nc);`
 						),
 						"}",
-						"script.src = jsonpScriptSrc(chunkId);",
+						"if(!window.retryerror){",
+                            "window.retryerror={};",
+                        "}",
+                        "var src = jsonpScriptSrc(chunkId);",
+                        "if(window.retryerror[chunkId]==1){",
+                            "src=src.indexOf('?')>0?(src+'&t='+new Date().getTime()):src+'?t='+new Date().getTime()",
+                        "}",
+						"script.src = src;",
 						crossOriginLoading
 							? Template.asString([
 									"if (script.src.indexOf(window.location.origin + '/') !== 0) {",
@@ -62,15 +67,22 @@ class ImportRetryPlugin {
 							Template.indent([
 								"if(chunk) {",
 								Template.indent([
-									"var errorType = event && (event.type === 'load' ? 'missing' : event.type);",
+									
 									"var realSrc = event && event.target && event.target.src;",
-									"var error = new Error('hahhaa 我该好你了 chunk ' + chunkId + ' failed.\\n(' + errorType + ': ' + realSrc + ')');",
-									"error.type = errorType;",
-									"error.request = realSrc;",
-									"chunk[1](error);"
+									"if(window.retryerror[chunkId]==1){",
+										"var errorType = event && (event.type === 'load' ? 'missing' : event.type);",
+										"var error = new Error('Loading chunk ' + chunkId + ' failed.\\n(' + errorType + ': ' + realSrc + ')');",
+										"error.type = errorType;",
+										"error.request = realSrc;",
+										"chunk[1](error);",
+										"installedChunks[chunkId] = undefined;",
+										"return;",
+									"}"
 								]),
 								"}",
-								"installedChunks[chunkId] = undefined;"
+								"window.retryerror[chunkId]=1;",
+								"installedChunks[chunkId] = undefined;",
+								"requireEnsure(chunkId);"
 							]),
 							"}"
 						]),
