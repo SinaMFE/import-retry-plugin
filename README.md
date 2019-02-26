@@ -25,3 +25,15 @@ const ImportRetryPlugin =require("import-retry-plugin");
 module.exports = {
   plugins:[new ImportRetryPlugin()]
 }
+```
+
+**js runtime**
+```
+// the script must excute before import the chunk file
+// src:the script's src
+// time:1 (first error)
+// time:2 (request src with random params and error again)
+window.onChunkError=function(src,time){
+
+}
+```

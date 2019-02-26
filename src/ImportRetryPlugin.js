@@ -70,6 +70,7 @@ class ImportRetryPlugin {
 									
 									"var realSrc = event && event.target && event.target.src;",
 									"if(window.retryerror[chunkId]==1){",
+										"if(window.onChunkError){window.onChunkError(realSrc,2)}",
 										"var errorType = event && (event.type === 'load' ? 'missing' : event.type);",
 										"var error = new Error('Loading chunk ' + chunkId + ' failed.\\n(' + errorType + ': ' + realSrc + ')');",
 										"error.type = errorType;",
@@ -81,6 +82,7 @@ class ImportRetryPlugin {
 								]),
 								"}",
 								"window.retryerror[chunkId]=1;",
+								"if(window.onChunkError){window.onChunkError(realSrc,1)}",
 								"installedChunks[chunkId] = undefined;",
 								"requireEnsure(chunkId);"
 							]),
