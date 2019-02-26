@@ -1,6 +1,6 @@
 {
   "name": "import-retry-plugin",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "dynamic import script with webpack4 ，when loading chunk error，retry it and break cdn ticks",
   "main": "dist/index.js",
   "scripts": {
